@@ -1,4 +1,5 @@
 # FastAPI Secure User Management & Calculation Service
+https://github.com/OWNER/REPOSITORY/actions/workflows/WORKFLOW-FILE/badge.svg
 
 ## Overview
 This is a **Module 12** FastAPI project that extends Module 11 with comprehensive user authentication, authorization, and a complete BREAD (Browse, Read, Edit, Add, Delete) API for managing calculations. The application features secure user registration and login, full calculation CRUD operations, and extensive test coverage.
