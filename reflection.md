@@ -1,81 +1,9 @@
-# Module 14 Reflection - Complete BREAD Operations with Authentication
+# Module 13 Reflection - JWT Authentication & E2E Testing
 
 ## Project Overview
-Module 14 built upon Module 13's JWT authentication foundation to implement complete BREAD (Browse, Read, Edit, Add, Delete) functionality for calculations. This module focused on securing all calculation endpoints with JWT authentication, creating a comprehensive front-end interface for managing calculations, implementing user-specific data isolation, and writing extensive Playwright E2E tests to verify all BREAD operations work correctly with both positive and negative scenarios.
+This module focused on implementing JWT-based authentication, creating front-end registration and login pages with client-side validation, writing comprehensive Playwright E2E tests, and maintaining a robust CI/CD pipeline for automated testing and Docker Hub deployment.
 
-## Module 14 Specific Accomplishments
-
-### 1. Authenticated BREAD Endpoints Implementation
-**What Was Implemented:**
-- Created a new `calculations_router.py` with all BREAD operations requiring JWT authentication
-- Implemented `get_current_user_email()` dependency in `security.py` using FastAPI's `HTTPBearer` security scheme
-- Added user-specific CRUD operations in `crud.py`:
-  - `get_user_calculations()` - Returns only calculations belonging to a specific user
-  - `get_calculation_by_id_and_user()` - Ensures calculation belongs to user before returning
-  - Updated `create_calculation()` to require `user_id` parameter
-  - Updated `update_calculation()` and `delete_calculation()` with optional user_id verification
-
-**Key Learning:**
-Proper API security requires not just authentication (verifying who the user is) but also authorization (ensuring users can only access their own data). Using FastAPI's dependency injection system makes it easy to enforce authentication across all endpoints while keeping code DRY.
-
-**Challenges Faced:**
-- **Challenge:** Needed to maintain backward compatibility with existing tests that didn't use authentication
-- **Solution:** Moved authenticated endpoints to a separate router (`calculations_router.py`) and kept old endpoints in `main.py` for legacy tests
-- **Challenge:** Extracting user information from JWT tokens consistently across all endpoints
-- **Solution:** Created `get_current_user_email()` dependency that handles token validation and user extraction in one place
-
-### 2. Comprehensive Frontend Development
-**What Was Implemented:**
-- Created `calculations.html` - a full-featured single-page application with:
-  - **Tabbed Navigation**: Browse, Add, Edit sections
-  - **Browse Section**: Displays all user calculations with result computation, Edit and Delete buttons
-  - **Add Section**: Form for creating new calculations with operation type dropdown
-  - **Edit Section**: Form for updating existing calculations with pre-population support
-  - **Client-Side Validation**: Checks for divide-by-zero, valid numbers, required fields
-  - **Session Management**: Automatic redirect to login on token expiry (401 errors)
-  - **User Feedback**: Real-time error and success messages for all operations
-  - **Confirmation Dialogs**: Delete operations require user confirmation
-
-**Key Learning:**
-Creating a good user experience requires thoughtful error handling and feedback. Users should always know what's happening (loading states, success messages, error explanations) and be prevented from making mistakes (client-side validation, confirmation dialogs).
-
-**Design Decisions:**
-- Used tabbed interface to keep all operations accessible without page navigation
-- Implemented automatic list refresh after Add/Edit/Delete operations for immediate feedback
-- Stored JWT token in localStorage for persistent authentication across page refreshes
-- Used semantic HTML and CSS for professional appearance and accessibility
-
-### 3. Enhanced E2E Testing for BREAD Operations
-**What Was Implemented:**
-13 new E2E tests in `test_calculations_e2e.py` covering:
-
-**Positive Tests (7):**
-- Add calculation with valid data (all operation types)
-- Browse all calculations (verifies list display)
-- Browse empty calculations list (new user scenario)
-- Edit calculation successfully (updates existing data)
-- Delete calculation (with confirmation dialog handling)
-- Read specific calculation details
-- Multiple operation types verification (Add, Sub, Multiply, Divide)
-
-**Negative Tests (6):**
-- Add calculation with divide by zero (client-side validation)
-- Add calculation with missing required fields
-- Edit non-existent calculation (404 error)
-- Unauthorized access without token (redirect to login)
-- Invalid numeric inputs
-
-**Key Learning:**
-Comprehensive E2E testing requires testing both the happy path and error scenarios. Negative tests are just as important as positive tests because they verify that the application handles errors gracefully and securely.
-
-**Testing Techniques Applied:**
-1. **Fixture Reuse**: Created `setup_user_and_login` fixture to handle user registration and authentication for all tests
-2. **Dialog Handling**: Used Playwright's dialog handler for delete confirmation dialogs
-3. **Dynamic Waits**: Used `wait_for(state="visible")` instead of fixed timeouts for reliability
-4. **Assertion Strategies**: Checked both UI elements and text content to verify operations
-5. **Test Isolation**: Each test registers a new user with random ID to prevent data conflicts
-
-## Key Experiences and Accomplishments (Background from Module 13)
+## Key Experiences and Accomplishments
 
 ### 1. JWT Authentication Implementation
 **What Was Implemented:**
@@ -237,7 +165,7 @@ This module closely mirrors real-world application development:
 - **Comprehensive testing** prevents production bugs and ensures code quality
 
 ## Conclusion
-Module 14 successfully implemented complete BREAD operations with JWT authentication, comprehensive E2E testing, and automated deployment. The project demonstrates mastery of secure authentication, user-specific data isolation, front-end/back-end integration, automated testing strategies, and modern DevOps practices. All 74 tests pass (61 unit/integration + 13 E2E), and the application is production-ready with automated CI/CD deployment to Docker Hub.
+Module 13 successfully implemented a complete JWT authentication system with comprehensive E2E testing and automated deployment. The project demonstrates mastery of secure authentication, front-end/back-end integration, automated testing strategies, and modern DevOps practices. All 74 tests pass (61 unit/integration + 13 E2E), and the application is production-ready with automated CI/CD deployment to Docker Hub.
 
 ## Statistics
 - **Total Lines of Code:** ~2000+
@@ -249,6 +177,6 @@ Module 14 successfully implemented complete BREAD operations with JWT authentica
 - **Time Invested:** ~15-20 hours (including debugging and refactoring)
 
 ## Links
-- **GitHub Repository:** https://github.com/Tejen1710/Module-14
+- **GitHub Repository:** https://github.com/Tejen1710/Module-13
 - **Docker Hub:** https://hub.docker.com/r/[your-username]/module13-calculator
 - **Debug Report:** See `DEBUG_REPORT.md` for detailed code review findings

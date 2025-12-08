@@ -2,9 +2,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer
-from fastapi.security.http import HTTPAuthorizationCredentials
 
 # Configuration
 SECRET_KEY = "change-me-to-a-long-random-secret"  # move to env later if you want
@@ -16,9 +13,6 @@ pwd_context = CryptContext(
     schemes=["pbkdf2_sha256"],
     deprecated="auto",
 )
-
-# Security scheme for bearer token
-security = HTTPBearer()
 
 def hash_password(plain_password: str) -> str:
     return pwd_context.hash(plain_password)
@@ -43,21 +37,3 @@ def decode_token(token: str) -> dict:
         return payload
     except JWTError:
         return {}
-
-
-def get_current_user_email(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
-    """
-    Extract and verify the current user's email from the JWT token.
-    Raises HTTPException if token is invalid.
-    """
-    token = credentials.credentials
-    payload = decode_token(token)
-    email = payload.get("sub")
-    
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return email

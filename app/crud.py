@@ -64,18 +64,13 @@ def authenticate_user(db: Session, email: str | None = None, username: str | Non
 
 # ---------- CALCULATION CRUD ----------
 
-def create_calculation(db: Session, calc_in: schemas.CalculationCreate, user_id: int | None = None) -> models.Calculation:
+def create_calculation(db: Session, calc_in: schemas.CalculationCreate) -> models.Calculation:
     data = _to_dict(calc_in)
-    db_calc = models.Calculation(**data, user_id=user_id)
+    db_calc = models.Calculation(**data)
     db.add(db_calc)
     db.commit()
     db.refresh(db_calc)
     return db_calc
-
-
-def get_user_calculations(db: Session, user_id: int) -> list[models.Calculation]:
-    """Get all calculations for a specific user"""
-    return db.query(models.Calculation).filter(models.Calculation.user_id == user_id).all()
 
 
 def get_all_calculations(db: Session) -> list[models.Calculation]:
@@ -86,25 +81,12 @@ def get_calculation_by_id(db: Session, calc_id: int) -> models.Calculation | Non
     return db.query(models.Calculation).filter(models.Calculation.id == calc_id).first()
 
 
-def get_calculation_by_id_and_user(db: Session, calc_id: int, user_id: int) -> models.Calculation | None:
-    """Get a calculation by ID, ensuring it belongs to the user"""
-    return db.query(models.Calculation).filter(
-        models.Calculation.id == calc_id,
-        models.Calculation.user_id == user_id
-    ).first()
-
-
 def update_calculation(
     db: Session,
     calc_id: int,
     calc_in: schemas.CalculationUpdate,
-    user_id: int | None = None,
 ) -> models.Calculation | None:
-    if user_id is not None:
-        calc = get_calculation_by_id_and_user(db, calc_id, user_id)
-    else:
-        calc = get_calculation_by_id(db, calc_id)
-    
+    calc = get_calculation_by_id(db, calc_id)
     if not calc:
         return None
 
@@ -118,12 +100,8 @@ def update_calculation(
     return calc
 
 
-def delete_calculation(db: Session, calc_id: int, user_id: int | None = None) -> bool:
-    if user_id is not None:
-        calc = get_calculation_by_id_and_user(db, calc_id, user_id)
-    else:
-        calc = get_calculation_by_id(db, calc_id)
-    
+def delete_calculation(db: Session, calc_id: int) -> bool:
+    calc = get_calculation_by_id(db, calc_id)
     if not calc:
         return False
 

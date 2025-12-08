@@ -1,28 +1,28 @@
-# FastAPI Calculator with BREAD Operations - Module 14
+# FastAPI JWT Authentication with E2E Testing - Module 13
 
 ## Overview
-This is a **Module 14** FastAPI project that implements complete BREAD (Browse, Read, Edit, Add, Delete) functionality for calculations with JWT authentication, comprehensive front-end interface, Playwright E2E tests, and automated CI/CD deployment to Docker Hub.
+This is a **Module 13** FastAPI project that implements JWT-based authentication with front-end registration and login pages, Playwright E2E tests, and automated CI/CD deployment to Docker Hub.
 
 ## Key Features
-- **Complete BREAD Operations**: Browse, Read, Edit, Add, Delete calculations with user authentication
-- **JWT Authentication**: Secure token-based authentication protecting all calculation endpoints
-- **Interactive Front-End**: Comprehensive calculations manager with tabbed interface for all operations
-- **User-Specific Data**: Each user can only view and manage their own calculations
-- **User Management**: Registration, login with secure password hashing (PBKDF2-SHA256)
+- **JWT Authentication**: Secure token-based authentication with /register and /login endpoints
+- **Front-End Pages**: Interactive HTML pages for user registration and login with client-side validation
+- **User Management**: Registration, login, and user retrieval with secure password hashing (PBKDF2-SHA256)
+- **Calculation Service**: Full BREAD operations (Create, Read, Update, Delete)
 - **Calculation Types**: Add, Subtract, Multiply, Divide with automatic result computation
-- **Data Validation**: Client-side and server-side validation (divide-by-zero, numeric checks)
+- **Data Validation**: Pydantic schemas with comprehensive validation (email format, password length, divide-by-zero)
 - **Database Integration**: SQLAlchemy ORM with SQLite/PostgreSQL support
-- **Comprehensive E2E Testing**: Playwright tests for all BREAD operations (positive & negative scenarios)
+- **E2E Testing**: Playwright automated tests for registration and login flows
 - **RESTful API**: FastAPI with automatic OpenAPI documentation
+- **Comprehensive Testing**: 61 unit tests + Playwright E2E tests (all passing ✅)
 - **CI/CD Pipeline**: GitHub Actions with automated testing and Docker Hub deployment
 - **Docker Support**: Containerized deployment ready
 
-## 🆕 Module 14 Additions
-- **Authenticated BREAD Endpoints**: All calculation operations require JWT authentication
-- **User-Scoped Calculations**: Users can only access their own calculation data
-- **Complete Frontend Interface**: Full-featured calculations manager with Browse, Add, Edit operations
-- **Enhanced E2E Tests**: Comprehensive Playwright tests covering all BREAD scenarios
-- **Updated CI/CD**: Modified pipeline for Module 14 with Docker Hub deployment
+## 🆕 Module 13 Additions
+- JWT token generation and validation
+- Client-side form validation for email format and password strength
+- Playwright E2E tests covering positive and negative scenarios
+- Front-end static pages for authentication
+- Automated CI/CD pipeline with E2E testing
 
 ## Project Structure
 
@@ -70,43 +70,24 @@ Root Files:
 
 ## API Endpoints
 
-### Authentication Endpoints
+### User Endpoints
 
-| Method | Endpoint | Description | Request Body | Response | Auth Required |
-|--------|----------|-------------|--------------|----------|---------------|
-| POST | `/register` | Register new user | `{email, password}` | `Token` (201) | No |
-| POST | `/login` | Authenticate user | `{email, password}` | `Token` (200) | No |
+| Method | Endpoint | Description | Request Body | Response |
+|--------|----------|-------------|--------------|----------|
+| POST | `/users/` | Register user (backward compatibility) | `UserCreate` | `UserRead` (201) |
+| POST | `/users/register` | Register user (Module 12 spec) | `UserCreate` | `UserRead` (201) |
+| POST | `/users/login` | Authenticate user | `UserLogin` | `UserRead` (200) |
+| GET | `/users/{user_id}` | Get user details | - | `UserRead` (200) |
 
-### User Endpoints (Legacy Compatibility)
+### Calculation Endpoints (BREAD)
 
-| Method | Endpoint | Description | Request Body | Response | Auth Required |
-|--------|----------|-------------|--------------|----------|---------------|
-| POST | `/users/` | Register user (old) | `UserCreate` | `UserRead` (201) | No |
-| POST | `/users/register` | Register user (old) | `UserCreate` | `UserRead` (201) | No |
-| POST | `/users/login` | Authenticate user (old) | `UserLogin` | `UserRead` (200) | No |
-| GET | `/users/{user_id}` | Get user details | - | `UserRead` (200) | No |
-
-### Calculation Endpoints (BREAD) - Module 14 Authenticated
-
-| Method | Endpoint | Description | Request Body | Response | BREAD Operation |
-|--------|----------|-------------|--------------|----------|-----------------|
-| POST | `/api/calculations/` | **Add** new calculation | `CalculationCreate` | `CalculationRead` (201) | Add |
-| GET | `/api/calculations/` | **Browse** all user calculations | - | `List[CalculationRead]` (200) | Browse |
-| GET | `/api/calculations/{calc_id}` | **Read** specific calculation | - | `CalculationRead` (200) | Read |
-| PUT | `/api/calculations/{calc_id}` | **Edit** existing calculation | `CalculationUpdate` | `CalculationRead` (200) | Edit |
-| DELETE | `/api/calculations/{calc_id}` | **Delete** calculation | - | None (204) | Delete |
-
-**Note**: All `/api/calculations/*` endpoints require a valid JWT token in the `Authorization: Bearer <token>` header. Users can only access their own calculations.
-
-### Legacy Calculation Endpoints (No Authentication - For Backward Compatibility)
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/calculations/` | Create calculation | No |
-| GET | `/calculations/` | Get all calculations | No |
-| GET | `/calculations/{calc_id}` | Get specific calculation | No |
-| PUT | `/calculations/{calc_id}` | Update calculation | No |
-| DELETE | `/calculations/{calc_id}` | Delete calculation | No |
+| Method | Endpoint | Description | Request Body | Response |
+|--------|----------|-------------|--------------|----------|
+| POST | `/calculations/` | **B**rowse/Create calculation | `CalculationCreate` | `CalculationRead` (201) |
+| GET | `/calculations/` | **R**ead all calculations | - | `List[CalculationRead]` (200) |
+| GET | `/calculations/{calc_id}` | **R**ead specific calculation | - | `CalculationRead` (200) |
+| PUT | `/calculations/{calc_id}` | **E**dit/Update calculation | `CalculationUpdate` | `CalculationRead` (200) |
+| DELETE | `/calculations/{calc_id}` | **A**dd/Delete calculation | - | None (204) |
 
 ## Data Models
 
@@ -155,8 +136,8 @@ result: float (computed on-the-fly in schema)
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Tejen1710/Module-14.git
-   cd module-14
+   git clone https://github.com/Tejen1710/Module-12.git
+   cd module-12
    ```
 
 2. **Create and activate virtual environment:**
@@ -248,11 +229,12 @@ pytest
 
 ## Usage Examples
 
-### 1. Register a New User (Get JWT Token)
+### Register a New User
 ```bash
-curl -X POST "http://127.0.0.1:8000/register" \
+curl -X POST "http://127.0.0.1:8000/users/register" \
   -H "Content-Type: application/json" \
   -d '{
+    "username": "johndoe",
     "email": "john@example.com",
     "password": "securepass123"
   }'
@@ -261,34 +243,27 @@ curl -X POST "http://127.0.0.1:8000/register" \
 **Response (201):**
 ```json
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer"
+  "id": 1,
+  "username": "johndoe",
+  "email": "john@example.com",
+  "created_at": "2025-12-01T10:30:00"
 }
 ```
 
-### 2. Login (Get JWT Token)
+### Login
 ```bash
-curl -X POST "http://127.0.0.1:8000/login" \
+curl -X POST "http://127.0.0.1:8000/users/login" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "john@example.com",
+    "username": "johndoe",
     "password": "securepass123"
   }'
 ```
 
-**Response (200):**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer"
-}
-```
-
-### 3. Add a Calculation (Requires JWT)
+### Create a Calculation
 ```bash
-curl -X POST "http://127.0.0.1:8000/api/calculations/" \
+curl -X POST "http://127.0.0.1:8000/calculations/" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -d '{
     "a": 15,
     "b": 3,
@@ -303,190 +278,92 @@ curl -X POST "http://127.0.0.1:8000/api/calculations/" \
   "a": 15.0,
   "b": 3.0,
   "type": "Multiply",
-  "user_id": 1,
+  "user_id": null,
   "result": 45.0
 }
 ```
 
-### 4. Browse All Calculations (Requires JWT)
+### Get All Calculations
 ```bash
-curl -X GET "http://127.0.0.1:8000/api/calculations/" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+curl -X GET "http://127.0.0.1:8000/calculations/"
 ```
 
-**Response (200):**
-```json
-[
-  {
-    "id": 1,
-    "a": 15.0,
-    "b": 3.0,
-    "type": "Multiply",
-    "user_id": 1,
-    "result": 45.0
-  },
-  {
-    "id": 2,
-    "a": 10.0,
-    "b": 5.0,
-    "type": "Add",
-    "user_id": 1,
-    "result": 15.0
-  }
-]
-```
-
-### 5. Read Specific Calculation (Requires JWT)
+### Update a Calculation
 ```bash
-curl -X GET "http://127.0.0.1:8000/api/calculations/1" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-```
-
-### 6. Edit/Update a Calculation (Requires JWT)
-```bash
-curl -X PUT "http://127.0.0.1:8000/api/calculations/1" \
+curl -X PUT "http://127.0.0.1:8000/calculations/1" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -d '{"type": "Divide"}'
 ```
 
-**Response (200):**
-```json
-{
-  "id": 1,
-  "a": 15.0,
-  "b": 3.0,
-  "type": "Divide",
-  "user_id": 1,
-  "result": 5.0
-}
-```
-
-### 7. Delete a Calculation (Requires JWT)
+### Delete a Calculation
 ```bash
-curl -X DELETE "http://127.0.0.1:8000/api/calculations/1" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+curl -X DELETE "http://127.0.0.1:8000/calculations/1"
 ```
-
-**Response (204 No Content)**
-
-## Frontend Usage
-
-### Access the Web Interface
-1. **Start the server** (see Running the Application above)
-2. **Register**: Navigate to `http://127.0.0.1:8000/static/register.html`
-3. **Login**: Navigate to `http://127.0.0.1:8000/static/login.html`
-4. **Manage Calculations**: After login, you'll be redirected to `http://127.0.0.1:8000/static/calculations.html`
-
-### Calculations Manager Features
-- **Browse**: View all your calculations in a list with results
-- **Add**: Create new calculations with operation type selection
-- **Edit**: Update existing calculations (click Edit button on any calculation)
-- **Delete**: Remove calculations with confirmation dialog
-- **Client-Side Validation**: Checks for divide-by-zero, valid numbers, required fields
-- **Automatic Redirects**: Session expiry detection redirects to login page
 
 ## Test Coverage
 
 ### Test Summary
-- **Total Tests**: 70+ ✅
+- **Total Tests**: 57 ✅
+- **User Tests**: 11 (registration, login, retrieval)
+- **Calculation Tests**: 16 (BREAD operations)
+- **Workflow Tests**: 1 (integrated user + calculation flow)
 - **Unit Tests**: 29 (factory, schemas, security)
-- **Integration Tests**: 28 (user + calculation API)
-- **E2E Tests**: 13+ (authentication + BREAD operations)
-
-### E2E Test Coverage (Module 14)
-
-**Calculations BREAD E2E Tests:**
-- ✅ Add calculation with valid data (positive)
-- ✅ Add calculation - divide by zero validation (negative)
-- ✅ Browse all calculations (positive)
-- ✅ Browse empty calculations list (positive)
-- ✅ Edit calculation successfully (positive)
-- ✅ Edit non-existent calculation (negative)
-- ✅ Delete calculation successfully (positive)
-- ✅ Add calculation with missing fields (negative)
-- ✅ Unauthorized access without token (negative)
-- ✅ Multiple operation types (Add, Sub, Multiply, Divide)
-
-**Authentication E2E Tests:**
-- ✅ Register with valid data (positive)
-- ✅ Login with valid credentials (positive)
-- ✅ Register with invalid email (negative)
-- ✅ Register with short password (negative)
-- ✅ Login with wrong password (negative)
 
 ### Key Test Categories
 
 **User Authentication Tests:**
-- JWT token generation and validation
-- Successful registration and login
-- Duplicate email validation
+- Successful registration
+- Duplicate username/email validation
 - Email format validation
 - Password strength validation
 - Login with correct/incorrect credentials
-- Session expiry handling
+- User not found scenarios
 
-**Calculation BREAD Tests (Authenticated):**
+**Calculation BREAD Tests:**
 - Create calculations (all operation types: Add, Sub, Multiply, Divide)
-- Divide-by-zero validation (client & server)
-- Browse user-specific calculations
-- Read specific calculation by ID
-- Edit calculations with partial updates
-- Delete calculations with confirmation
-- User data isolation (users can only see their own data)
+- Divide-by-zero validation
+- Invalid operation type rejection
+- Read all calculations (empty and populated)
+- Read specific calculation
+- Partial updates (update individual fields)
+- Delete calculations
 
 **Integration Tests:**
 - Full workflow (register → login → create calculations)
-- Multiple users with isolated calculation data
-- JWT authentication on all calculation endpoints
+- Multiple users with multiple calculations
 - Database persistence
 - Relationship integrity (user-calculation)
 
-## BREAD Operations Details
+## CRUD Operations Details
 
-### ADD (CREATE)
-- **Endpoint**: `POST /calculations/`
-- **Authentication**: Required (JWT Bearer token)
-- **Validation**: Numeric operands, valid operation type, divide-by-zero check
-- **Response**: 201 Created with full resource including computed result
-- **User Scoping**: Calculation automatically associated with authenticated user
+### CREATE
+- **Endpoint**: `POST /users/register`, `POST /calculations/`
+- **Validation**: Email format, password strength, divide-by-zero check
+- **Response**: 201 Created with full resource
 
-### BROWSE (READ ALL)
-- **Endpoint**: `GET /calculations/`
-- **Authentication**: Required (JWT Bearer token)
-- **Response**: 200 OK with array of user's calculations
-- **User Scoping**: Returns only calculations belonging to authenticated user
+### READ
+- **Endpoints**: `GET /users/{id}`, `GET /calculations/`, `GET /calculations/{id}`
+- **Response**: 200 OK with resource data
+- **Error**: 404 Not Found for missing resources
 
-### READ (READ ONE)
-- **Endpoint**: `GET /calculations/{calc_id}`
-- **Authentication**: Required (JWT Bearer token)
-- **Response**: 200 OK with calculation details
-- **Error**: 404 Not Found if doesn't exist or doesn't belong to user
-
-### EDIT (UPDATE)
-- **Endpoint**: `PUT /calculations/{calc_id}`
-- **Authentication**: Required (JWT Bearer token)
+### UPDATE
+- **Endpoint**: `PUT /calculations/{id}`
 - **Features**: Partial updates, field-level flexibility
 - **Response**: 200 OK with updated resource
-- **Error**: 404 Not Found if doesn't exist or doesn't belong to user
+- **Error**: 404 Not Found for missing resource
 
 ### DELETE
-- **Endpoint**: `DELETE /calculations/{calc_id}`
-- **Authentication**: Required (JWT Bearer token)
+- **Endpoint**: `DELETE /calculations/{id}`
 - **Response**: 204 No Content
-- **Error**: 404 Not Found if doesn't exist or doesn't belong to user
+- **Error**: 404 Not Found for missing resource
 
 ## Security Features
-- **JWT Authentication**: Bearer token required for all calculation operations
-- **User Data Isolation**: Users can only access their own calculations
-- **Password Hashing**: PBKDF2-SHA256 algorithm (secure, no salt issues)
-- **Token Expiration**: 60-minute expiry on JWT tokens
+- **Password Hashing**: PBKDF2-SHA256 algorithm
 - **Input Validation**: Pydantic schemas with type hints
-- **Error Handling**: Appropriate HTTP status codes (401, 404, etc.)
+- **Error Handling**: Appropriate HTTP status codes
 - **Database Constraints**: Unique constraints on username and email
 - **Relationships**: CASCADE delete for data integrity
 - **Dependency Injection**: FastAPI's dependency system for database sessions
-- **HTTPBearer Security**: Standardized security scheme for token handling
 
 ## Docker Deployment
 
@@ -523,27 +400,50 @@ docker stop calculator-app
 - `PORT`: Server port (default: `8000`)
 - `HOST`: Server host (default: `0.0.0.0`)
 
-## Module 14: Complete BREAD Operations with Authentication
+## Module 13: JWT Authentication & E2E Testing
 
-### What's New in Module 14
+### JWT Authentication Endpoints
 
-**Authenticated Calculation Endpoints:**
-- All calculation BREAD operations require JWT authentication
-- Users can only access their own calculation data
-- Complete user data isolation and security
+| Method | Endpoint | Description | Request Body | Response |
+|--------|----------|-------------|--------------|----------|
+| POST | `/register` | Register user (JWT) | `{email, password}` | `{access_token, token_type}` (200) |
+| POST | `/login` | Login user (JWT) | `{email, password}` | `{access_token, token_type}` (200) |
 
-**Comprehensive Frontend:**
-- Full-featured calculations manager (`calculations.html`)
-- Tabbed interface for Browse, Add, and Edit operations
-- Real-time validation and error handling
-- Automatic session expiry detection and redirect
-- Delete functionality with confirmation dialogs
+**Features:**
+- Auto-generates username from email (e.g., `john@example.com` → `john`)
+- Returns JWT token upon successful registration/login
+- Token expires in 60 minutes (configurable)
+- Uses HS256 algorithm for JWT signing
 
-**Enhanced E2E Testing:**
-- Complete BREAD operation test coverage
-- Positive and negative test scenarios
-- Authentication flow testing
-- User data isolation verification
+### Front-End Pages
+
+**Access the front-end:**
+- Registration: http://127.0.0.1:8000/static/register.html
+- Login: http://127.0.0.1:8000/static/login.html
+
+**Client-Side Validation:**
+- Email format validation (must contain @)
+- Password length validation (min 8 characters)
+- Password confirmation matching
+- Real-time error messages
+- JWT token stored in localStorage
+
+### Running the Front-End
+
+1. **Start the server:**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+2. **Open in browser:**
+   - Register: http://localhost:8000/static/register.html
+   - Login: http://localhost:8000/static/login.html
+
+3. **Test the workflow:**
+   - Register a new user with email and password
+   - Check browser console or localStorage for JWT token
+   - Login with the same credentials
+   - Verify token is stored
 
 ### Playwright E2E Tests
 
@@ -557,44 +457,51 @@ python -m playwright install chromium
 # Run all E2E tests
 pytest tests/e2e/ -v
 
-# Run specific E2E test files
+# Run specific E2E test file
 pytest tests/e2e/test_register_e2e.py -v
 pytest tests/e2e/test_login_e2e.py -v
-pytest tests/e2e/test_calculations_e2e.py -v
 
 # Run with headed browser (see the tests run)
 pytest tests/e2e/ -v --headed
 
 # Run E2E tests with server already running
+# (Start server in one terminal, run tests in another)
 uvicorn app.main:app --reload
 pytest tests/e2e/ -v
 ```
 
-**E2E Test Files:**
-- `test_register_e2e.py` - User registration tests
-- `test_login_e2e.py` - User login tests
-- `test_calculations_e2e.py` - **NEW** Complete BREAD operations tests
+**E2E Test Coverage:**
+
+**Positive Tests:**
+- ✅ Register with valid data (email format, password length ≥8)
+- ✅ Login with correct credentials
+- ✅ JWT token stored in localStorage
+- ✅ Success messages displayed
+- ✅ Complete workflow: register → login
+
+**Negative Tests:**
+- ✅ Register with short password → front-end error
+- ✅ Register with mismatched passwords → front-end error
+- ✅ Register with invalid email → front-end error
+- ✅ Register with duplicate email → server 400 error
+- ✅ Login with wrong password → server 401 error
+- ✅ Login with non-existent user → server 401 error
+- ✅ Login with invalid email format → front-end error
 
 ### CI/CD Pipeline
 
 **GitHub Actions Workflow:**
-1. Checkout code
-2. Set up Python 3.11
-3. Install dependencies from requirements.txt
-4. Install Playwright browsers
-5. Run unit and integration tests
-6. Start FastAPI server in background
-7. Run Playwright E2E tests (including new BREAD tests)
-8. Login to Docker Hub (if tests pass)
-9. Build and push Docker image to Docker Hub (if tests pass)
+1. Run unit tests (pytest)
+2. Run integration tests
+3. Install Playwright browsers
+4. Start FastAPI server in background
+5. Run Playwright E2E tests
+6. Build Docker image (if all tests pass)
+7. Push to Docker Hub (if all tests pass)
 
 **View workflow:** `.github/workflows/ci.yml`
 
-**Docker Hub Repository:** `[your-username]/module14-calculator`
-
-**Secrets Required:**
-- `DOCKERHUB_USERNAME` - Your Docker Hub username
-- `DOCKERHUB_TOKEN` - Your Docker Hub access token
+**Docker Hub Repository:** https://hub.docker.com/r/[your-username]/module13-calculator
 
 ### Testing Workflow
 
@@ -604,50 +511,14 @@ pytest tests/e2e/ -v
 pytest tests/unit tests/integration tests/test_*.py -v
 
 # 2. Start server for E2E tests
-uvicorn app.main:app --host 127.0.0.1 --port 8000 &
-sleep 5
+uvicorn app.main:app --reload &
 
 # 3. Run E2E tests
 pytest tests/e2e/ -v
 
-# 4. Run all tests together
+# 4. Run all tests (E2E will auto-start server)
 pytest -v
 ```
-
-**Test individual components:**
-```bash
-# Unit tests only
-pytest tests/unit/ -v
-
-# Integration tests only
-pytest tests/integration/ -v
-
-# E2E tests only (BREAD operations)
-pytest tests/e2e/test_calculations_e2e.py -v
-```
-
-## Submission Checklist
-
-### Required Files ✅
-- [x] Complete BREAD endpoints with JWT authentication
-- [x] Frontend `calculations.html` with all operations
-- [x] Comprehensive E2E tests for BREAD operations
-- [x] Updated GitHub Actions CI/CD workflow
-- [x] Updated README with Module 14 documentation
-- [x] reflection.md with project insights
-
-### Screenshots to Provide 📸
-1. **GitHub Actions Workflow** - Successful CI/CD run
-2. **Docker Hub** - Pushed image in repository
-3. **Frontend BREAD Operations** - Screenshots of:
-   - Browse calculations page
-   - Add calculation form
-   - Edit calculation form
-   - Delete confirmation dialog
-
-### Links to Provide 🔗
-- GitHub Repository URL
-- Docker Hub Repository URL
 
 ## Dependencies
 
@@ -707,7 +578,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 **Tejen Thakkar**
 - GitHub: [@Tejen1710](https://github.com/Tejen1710)
-- Repository: [Module-14](https://github.com/Tejen1710/Module-14)
+- Repository: [Module-12](https://github.com/Tejen1710/Module-12)
 
 ## References
 
